@@ -30,8 +30,7 @@ class MemesListAdapter(private val memesContainer: MemesContainer, val onClick: 
     }
 
     override fun getItemCount(): Int {
-//        return memesContainer.data.memes.size
-        return 10
+        return memesContainer.data.memes.size
     }
 
     inner class MemesViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

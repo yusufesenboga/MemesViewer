@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import com.agobnese.memesviewer.R
@@ -35,8 +36,9 @@ class DetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.fetchMemesContainer()?.let { setValuesForDetails(it, position) }
-
+        viewModel.memesContainerLiveData.observe(viewLifecycleOwner, {
+            setValuesForDetails(it,position)
+        })
     }
 
     fun setValuesForDetails(memesContainer: MemesContainer, position: Int) {
