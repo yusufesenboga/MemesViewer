@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.navArgs
 import com.agobnese.memesviewer.R
 import com.agobnese.memesviewer.model.MemesContainer
+import com.agobnese.memesviewer.model.MemesContainerResult
 import com.agobnese.memesviewer.viewmodel.MemesViewerViewModel
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.fragment_details.*
@@ -36,8 +37,18 @@ class DetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.memesContainerLiveData.observe(viewLifecycleOwner, {
-            setValuesForDetails(it,position)
+        viewModel.memesContainerResultLiveData.observe(viewLifecycleOwner, Observer {
+            it?.let { memesContainerResult ->
+
+                when (memesContainerResult) {
+                    is MemesContainerResult.Success -> {
+                        setValuesForDetails(memesContainerResult.memesContainer, position)
+                    }
+                    MemesContainerResult.isLoading -> {
+
+                    }
+                }
+            }
         })
     }
 

@@ -1,38 +1,32 @@
 package com.agobnese.memesviewer.viewmodel
 
-import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.agobnese.memesviewer.model.MemesContainer
-import com.agobnese.memesviewer.network.MemesNetworkService
-import com.agobnese.memesviewer.network.RetrofitClient
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import androidx.lifecycle.viewModelScope
+import com.agobnese.memesviewer.model.MemesContainerResult
+import com.agobnese.memesviewer.repository.MemesRepository
+import com.agobnese.memesviewer.repository.MemesRepositoryImp
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MemesViewerViewModel : ViewModel() {
+@HiltViewModel
+class MemesViewerViewModel @Inject constructor(private val repo: MemesRepository) : ViewModel() {
 
-    val memesContainerLiveData = MutableLiveData<MemesContainer>()
+    private val _memesContainerResultLiveData = repo.memeContainerResultLiveData
+    val memesContainerResultLiveData: LiveData<MemesContainerResult>
+        get() = _memesContainerResultLiveData
+
+    init {
+        fetchMemesContainer()
+    }
 
     fun fetchMemesContainer() {
-        val client = RetrofitClient.retrofit?.create(MemesNetworkService::class.java)
-        val fetchingCall = client?.getMemes()
-
-        fetchingCall?.enqueue(object : Callback<MemesContainer> {
-            override fun onResponse(
-                call: Call<MemesContainer>,
-                response: Response<MemesContainer>
-            ) {
-                val fetchedInfo = response.body()
-                fetchedInfo.let {
-                    memesContainerLiveData.value = it
-                }
-            }
-
-            override fun onFailure(call: Call<MemesContainer>, t: Throwable) {
-                Log.d("Application Tag", t.localizedMessage)
-            }
-
-        })
+        _memesContainerResultLiveData.value = MemesContainerResult.isLoading
+        viewModelScope.launch {
+            repo.fetchMemesContainer()
+        }
     }
+
 }
